@@ -4,7 +4,7 @@ import {
   BiTrash,
   BiShare,
 } from "react-icons/bi";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
@@ -38,12 +38,17 @@ const Card = styled.div`
   margin: 10px;
   box-shadow: 4px 4px 24px rgba(0, 0, 0, 0.15);
 `;
-export default function NoteCard({ color }) {
+export default function NoteCard(props) {
   const [open, setopen] = useState(false);
+  const [note, setnote] = useState("");
+  useEffect(() => {
+    setnote(props.note.slice(0, 100));
+  }, [props.note]);
+
   return (
     <>
       <div className="col-lg-3 col-md-6 col-sm-12">
-        <Card className="card" Color={color}>
+        <Card className="card" Color={props.color}>
           <Cardheader>
             <BiDotsHorizontalRounded
               className="cursor-pointer absolute right-5 text-xl"
@@ -83,14 +88,11 @@ export default function NoteCard({ color }) {
             )}
           </Cardheader>
           <div className="card-body">
-            <h5>Special title treatment</h5>
-            <p>
-              With supporting text below as a natural lead-in to additional
-              content.
-            </p>
+            <h5>{props.title}</h5>
+            <p>{note}...</p>
           </div>
           <CardFooter className="text-muted">
-            &nbsp;&nbsp; &nbsp; 2 days ago
+            &nbsp;&nbsp; &nbsp; {props.date}
           </CardFooter>
         </Card>
       </div>

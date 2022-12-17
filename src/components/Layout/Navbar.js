@@ -4,7 +4,7 @@ import {
   BiLogOut,
   BiEdit,
   BiBook,
-  BiFolder,
+  BiHeart,
 } from "react-icons/bi";
 import { BsArrowLeftShort } from "react-icons/bs";
 import { useState } from "react";
@@ -138,13 +138,13 @@ export default function Navbar() {
           <li className="Link">
             <NavLink>
               <LinkContainer open={open}>
-                <BiFolder className="text-2xl LinkIcon" />
+                <BiHeart className="text-2xl LinkIcon" />
                 <h4
                   className={`${
                     !open && "scale-0"
                   }  origin-left text-xl ml-5 duration-500 font-normal`}
                 >
-                  Folder
+                  Favorites
                 </h4>
               </LinkContainer>
             </NavLink>
