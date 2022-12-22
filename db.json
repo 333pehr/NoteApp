@@ -1,0 +1,25 @@
+{
+    "music": [
+        {
+            "title": "The Sound of Silence",
+            "artist": "Simon & Garfunkel",
+            "album": "Wednesday Morning, 3 A.M.",
+            "year": 1964,
+            "genre": "folk",
+            "duration": 181,
+            "track": 1,
+            "path": "music/The Sound of Silence.mp3"
+        },
+        {
+            "title": "The Sound of Silence",
+            "artist": "Disturbed",
+            "album": "The Sickness",
+            "year": 2000,
+            "genre": "metal",
+            "duration": 181,
+            "track": 1,
+            "path": "music/The Sound of Silence.mp3"
+        }
+
+    ]
+}

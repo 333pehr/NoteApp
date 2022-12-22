@@ -5,39 +5,86 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
 } from "firebase/auth";
-import { auth } from "../../firebase-config";
+import { auth, db } from "../../firebase-config";
 import "./SignIn.css";
 import googleLogo from "./google.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLock, faEnvelope, faUser } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { doc, setDoc } from "firebase/firestore";
 
 export default function SignIn() {
   const [fullName, setFullName] = useState("");
   const [Email, setEmail] = useState("");
+  const [showsignInError, setshowsignInError] = useState(true);
+  const [SignInError, setSignInError] = useState("");
+  const [showSignUpError, showsetSignUpError] = useState(true);
+  const [SignUpError, setSignUpError] = useState("");
   const [password, setpassword] = useState("");
   const container = useRef();
+  const date = new Date();
+
   const navigate = useNavigate();
   const signIn = async () => {
     try {
-      await signInWithEmailAndPassword(auth, Email, password).then((user) => {
-        console.log(user);
+      await signInWithEmailAndPassword(auth, Email, password).then(() => {
         navigate("/dashboard");
       });
     } catch (err) {
-      console.log(err);
+      console.log(err.code);
+      if (err.code === "auth/user-not-found") {
+        setshowsignInError(true);
+        setSignInError("Email not found, Make sure you have signed up");
+      } else if (err.code === "auth/wrong-password") {
+        setshowsignInError(true);
+        setSignInError("Wrong password or email address, please try again");
+      } else {
+        setshowsignInError(true);
+        setSignInError("Something went wrong, please try again");
+      }
     }
   };
   const register = async () => {
     try {
-      await createUserWithEmailAndPassword(auth, Email, password).then(
-        (UserCredential) => {
-          console.log(UserCredential);
+      await createUserWithEmailAndPassword(auth, Email, password)
+        .then((UserCredential) => {
+          setDoc(doc(db, "notes", UserCredential.user.uid), {
+            fullName: fullName,
+            userID: UserCredential.user.uid,
+            notes: [
+              {
+                title: "Welcome to Notes App",
+                color: "#000000",
+                note: "This is a test note",
+                isFavourite: false,
+                date:
+                  date.getDate() +
+                  "/" +
+                  date.getMonth() +
+                  "/" +
+                  date.getFullYear(),
+              },
+            ],
+          });
+        })
+        .then(() => {
           navigate("/dashboard");
-        }
-      );
+        });
     } catch (err) {
-      console.log(err.message);
+      console.log(err.code);
+      if (err.code === "auth/email-already-in-use") {
+        showsetSignUpError(true);
+        setSignUpError("you have already signed up, please sign in");
+      } else if (err.code === "auth/invalid-email") {
+        showsetSignUpError(true);
+        setSignUpError("Invalid email address, please try again");
+      } else if (err.code === "auth/weak-password") {
+        showsetSignUpError(true);
+        setSignUpError("Weak password, please choose a strong password");
+      } else {
+        showsetSignUpError(true);
+        setSignUpError("Something went wrong, please try again");
+      }
     }
   };
   const googleAuth = async () => {
@@ -46,17 +93,14 @@ export default function SignIn() {
       .then((result) => {
         const credential = GoogleAuthProvider.credentialFromResult(result);
         const token = credential.accessToken;
-        // The signed-in user info.
         const user = result.user;
         navigate("/dashboard");
       })
       .catch((error) => {
-        // Handle Errors here.
         const errorCode = error.code;
         const errorMessage = error.message;
-        // The email of the user's account used.
         const email = error.customData.email;
-        // The AuthCredential type that was used.
+        // The AuthCredential type that was used
         const credential = GoogleAuthProvider.credentialFromError(error);
         // ...
       });
@@ -85,6 +129,7 @@ export default function SignIn() {
                   onChange={(e) => {
                     setEmail(e.target.value);
                   }}
+                  className="w-full"
                 />
               </div>
               <div className="inputfield">
@@ -96,9 +141,18 @@ export default function SignIn() {
                   onChange={(e) => {
                     setpassword(e.target.value);
                   }}
+                  className="w-full"
                 />
               </div>
+              <div className="forgotPass">
+                <Link to="/reset-password" className="no-underline text-right">
+                  Forgot Password?
+                </Link>
+              </div>
               <button className="SignInBtn"> Sign In </button>
+              {showsignInError ? (
+                <h6 className="text-red-500">{SignInError}</h6>
+              ) : null}
               <p className="socialtext">Or</p>
               <div
                 className="socialmedia"
@@ -133,6 +187,7 @@ export default function SignIn() {
                   onChange={(e) => {
                     setFullName(e.target.value);
                   }}
+                  className="w-full"
                 />
               </div>
               <div className="inputfield">
@@ -144,6 +199,7 @@ export default function SignIn() {
                   onChange={(e) => {
                     setEmail(e.target.value);
                   }}
+                  className="w-full"
                 />
               </div>
               <div className="inputfield">
@@ -155,11 +211,15 @@ export default function SignIn() {
                   onChange={(e) => {
                     setpassword(e.target.value);
                   }}
+                  className="w-full"
                 />
               </div>
               <button className="SignInBtn" value="Sign up">
                 Sign Up
               </button>
+              {showSignUpError ? (
+                <h6 className="text-red-500">{SignUpError}</h6>
+              ) : null}
               <p className="socialtext">Or</p>
               <div
                 className="socialmedia"

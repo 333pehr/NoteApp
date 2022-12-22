@@ -4,7 +4,7 @@ import {
   BiLogOut,
   BiEdit,
   BiBook,
-  BiFolder,
+  BiHeart,
 } from "react-icons/bi";
 import { BsArrowLeftShort } from "react-icons/bs";
 import { useState } from "react";
@@ -74,7 +74,7 @@ export default function Navbar() {
           onClick={() => {
             setopen(!open);
           }}
-          className={`bg-white text-dark text-5xl rounded-full absolute -right-7 top-8 border border-dark-purple cursor-pointer ${
+          className={`bg-white text-dark text-5xl rounded-full absolute -right-10 top-8 border border-dark-purple cursor-pointer ${
             !open && "transform rotate-180"
           } duration-500`}
         />
@@ -86,7 +86,7 @@ export default function Navbar() {
                 <h4
                   className={`${
                     !open && "scale-0"
-                  }  origin-left text-2xl ml-2 duration-500 font-semibold`}
+                  }  origin-left text-2xl ml-2 duration-500 font-semibold select-none`}
                 >
                   NoteApp
                 </h4>
@@ -100,7 +100,7 @@ export default function Navbar() {
                 <h4
                   className={`${
                     !open && "scale-0"
-                  }  origin-left text-xl ml-5 duration-500 font-normal`}
+                  }  origin-left text-xl ml-5 duration-500 font-normal select-none`}
                 >
                   Profile
                 </h4>
@@ -114,7 +114,7 @@ export default function Navbar() {
                 <h4
                   className={`${
                     !open && "scale-0"
-                  }  origin-left text-xl ml-5 duration-500 font-normal`}
+                  }  origin-left text-xl ml-5 duration-500 font-normal select-none`}
                 >
                   Notes
                 </h4>
@@ -122,29 +122,29 @@ export default function Navbar() {
             </NavLink>
           </li>
           <li className="Link">
-            <NavLink>
+            <a href="http://127.0.0.1:5500/index.html">
               <LinkContainer open={open}>
                 <BiBook className="text-2xl LinkIcon" />
                 <h4
                   className={`${
                     !open && "scale-0"
-                  }  origin-left text-xl ml-5 duration-500 font-normal`}
+                  }  origin-left text-xl ml-5 duration-500 font-normal select-none`}
                 >
                   Study
                 </h4>
               </LinkContainer>
-            </NavLink>
+            </a>
           </li>
           <li className="Link">
-            <NavLink>
+            <NavLink to="/dashboard/favouritenotes">
               <LinkContainer open={open}>
-                <BiFolder className="text-2xl LinkIcon" />
+                <BiHeart className="text-2xl LinkIcon" />
                 <h4
                   className={`${
                     !open && "scale-0"
-                  }  origin-left text-xl ml-5 duration-500 font-normal`}
+                  }  origin-left text-xl ml-5 duration-500 font-normal select-none`}
                 >
-                  Folder
+                  Favorites
                 </h4>
               </LinkContainer>
             </NavLink>
@@ -152,9 +152,11 @@ export default function Navbar() {
           <li className="LastLink">
             <NavLink
               onClick={() => {
-                handleLogout().then(() => {
-                  navigate("/").catch((err) => console.log(err));
-                });
+                handleLogout()
+                  .then(() => {
+                    navigate("/");
+                  })
+                  .catch((err) => console.log(err));
               }}
             >
               <LinkContainer open={open}>
@@ -162,7 +164,7 @@ export default function Navbar() {
                 <h4
                   className={`${
                     !open && "scale-0"
-                  }  origin-left text-xl ml-5 duration-500 font-normal`}
+                  }  origin-left text-xl ml-5 duration-500 font-normal select-none`}
                 >
                   Log Out
                 </h4>

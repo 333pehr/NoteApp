@@ -5,16 +5,17 @@ import styled from "styled-components";
 import { Routes, Route } from "react-router-dom";
 import NotesPage from "../NotesPage";
 import Profile from "../Profile/Profile";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AddNote from "../../components/AddNote";
 import { auth } from "../../firebase-config";
 import { onAuthStateChanged } from "firebase/auth";
+import FavouriteNotes from "../FavouriteNotes";
 
 const HomePage = styled.div`
   height: 100vh;
   display: flex;
   position: fixed;
+  width: 100%;
 `;
 
 const Page = styled.div`
@@ -26,6 +27,19 @@ const Page = styled.div`
 `;
 
 export default function Home() {
+  const navigate = useNavigate();
+  const authorized = async () => {
+    await onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        navigate("/");
+      } else {
+        localStorage.setItem("uid", user.uid);
+      }
+    });
+  };
+  useEffect(() => {
+    authorized();
+  }, []);
   return (
     <>
       <Header />
@@ -34,13 +48,11 @@ export default function Home() {
         <Navbar />
         {/*<!--Container Main start-->*/}
         <Page>
-          <div>
-            <h1></h1>
-            <Routes>
-              <Route path="/" element={<NotesPage />} />
-              <Route path="profile" element={<Profile />} />
-            </Routes>
-          </div>
+          <Routes>
+            <Route path="/" element={<NotesPage />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="favouritenotes" element={<FavouriteNotes />} />
+          </Routes>
           {/*<!-- End Notes Card -->*/}
         </Page>
         {/*<!--Container Main end-->*/}

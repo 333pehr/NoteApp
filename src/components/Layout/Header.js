@@ -1,7 +1,6 @@
 import styled from "styled-components";
-import { auth } from "../../firebase-config";
-import { useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
+import { useState, useEffect } from "react";
+import { useAuth } from "../../firebase-config";
 
 const Row = styled.div`
   position: fixed;
@@ -13,8 +12,8 @@ const Row = styled.div`
 `;
 const Profile = styled.div`
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 15px;
+  right: 25px;
   width: 50px;
   height: 50px;
   border-radius: 50%;
@@ -26,12 +25,20 @@ const Profile = styled.div`
   }
 `;
 export default function Header() {
-  const [user, setuser] = useState({});
+  const [photoUrl, setPhotoUrl] = useState(
+    "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
+  );
+  const user = useAuth();
+  useEffect(() => {
+    if (user?.photoURL) {
+      setPhotoUrl(user.photoURL);
+    }
+  }, [user]);
   return (
     <>
       <Row>
         <Profile>
-          <img src="https://i.imgur.com/hczKIze.jpg" alt="logo" />
+          <img src={photoUrl} alt="logo" />
         </Profile>
       </Row>
     </>

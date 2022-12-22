@@ -3,6 +3,9 @@ import { BiPencil, BiChevronDown } from "react-icons/bi";
 import { useState, useRef } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import { Button } from "react-bootstrap";
+import { getDoc, doc, updateDoc } from "firebase/firestore";
+import { db } from "../firebase-config";
+import { v4 as uuidv4 } from "uuid";
 
 const Container = styled.div`
   background-color: #ffffff;
@@ -12,7 +15,7 @@ const Container = styled.div`
   padding: 1rem 0rem;
   display: flex;
   flex-direction: column;
-  height: ${(props) => (props.open ? "800px" : "70px")};
+  height: ${(props) => (props.open ? "850px" : "70px")};
   transition: height 0.5s;
   position: relative;
 `;
@@ -67,6 +70,7 @@ const Input = styled.input`
 
 const ButtonContainer = styled.div`
   margin-left: 55px;
+  margin-top: 10px;
   display: flex;
   align-items: center;
   width: 180px;
@@ -92,6 +96,9 @@ const ColorContainer = styled.ul`
     background-color: #8ac3a3;
     margin-left: 0px;
   }
+  li:nth-child(1):active {
+    border: 2px solid #000000;
+  }
   li:nth-child(2) {
     background-color: #87baf5;
   }
@@ -109,14 +116,32 @@ const ColorContainer = styled.ul`
   }
 `;
 
-export default function AddNote() {
+export default function AddNote(props) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [Color, setColor] = useState("#8ac3a3");
+  const [editorNote, setEditorNote] = useState("");
+  const [isFavorite, setIsFavorite] = useState(false);
   const editorRef = useRef(null);
-  const log = () => {
-    if (editorRef.current) {
-      console.log(editorRef.current.getContent());
+  const SendNote = async () => {
+    let time = new Date();
+    const note = {
+      title: title,
+      note: editorNote,
+      color: Color,
+      date: Intl.DateTimeFormat("en-US", { dateStyle: "full" }).format(time),
+      id: uuidv4(),
+      isFavorite: isFavorite,
+    };
+    const docRef = doc(db, "notes", localStorage.getItem("uid"));
+    const docSnap = await getDoc(docRef);
+    console.log(docRef);
+    if (docSnap.exists()) {
+      await updateDoc(docRef, {
+        notes: [...props.notes, note],
+      });
+    } else {
+      console.log("No such document!");
     }
   };
 
@@ -143,6 +168,7 @@ export default function AddNote() {
             onChange={(e) => {
               setTitle(e.target.value);
             }}
+            value={title}
           />
         </TitleInput>
         <EditorContainer open={open}>
@@ -150,6 +176,7 @@ export default function AddNote() {
             className="duration-500"
             apiKey="6s0oikvck6f3ixgzocx2vjggjyq078smmj7q2hend8p9mvn8"
             onInit={(evt, editor) => (editorRef.current = editor)}
+            value={editorNote}
             init={{
               menubar: false,
               object_resizing: false,
@@ -163,8 +190,12 @@ export default function AddNote() {
               content_style:
                 "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
             }}
+            onChange={(e) => {
+              setEditorNote(e.target.getContent());
+            }}
           />
-          <div>
+          <div className="d-flex items-center">
+            <h5 className="mr-2">Color: </h5>
             <ColorContainer>
               <li
                 onClick={() => {
@@ -193,11 +224,44 @@ export default function AddNote() {
               ></li>
             </ColorContainer>
           </div>
+          <div className="d-flex  items-center mb-2">
+            <input
+              type="checkbox"
+              className="mr-3"
+              onClick={(e) => {
+                setIsFavorite(e.target.checked);
+              }}
+              value={isFavorite}
+            />
+            <div className="text-lg">Add to favourite</div>
+          </div>
           <ButtonContainer>
-            <Button variant="primary" size="lg">
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={() => {
+                SendNote();
+                setOpen(!open);
+                props.updater();
+                setTitle("");
+                setEditorNote("");
+                setIsFavorite(false);
+                setColor("#8ac3a3");
+              }}
+            >
               Save
             </Button>
-            <Button variant="primary" size="lg">
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={() => {
+                setTitle("e");
+                setEditorNote("e");
+                setIsFavorite(false);
+                setColor("#8ac3a3");
+                setOpen(!open);
+              }}
+            >
               Close
             </Button>
           </ButtonContainer>
